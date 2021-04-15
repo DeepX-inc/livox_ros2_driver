@@ -72,7 +72,7 @@ int32_t Lddc::GetPublishStartTime(LidarDevice *lidar, LidarDataQueue *queue,
   uint32_t diff_time = publish_period_ns_ - remaining_time;
   /** Get start time, down to the period boundary */
   if (diff_time > (publish_period_ns_ / 4)) {
-    // RCLCPP_INFO(cur_node_->get_logger(), "0 : %u", diff_time);
+    // RCLCPP_INFO(cur_node_.lock()->get_logger(), "0 : %u", diff_time);
     *start_time = timestamp - remaining_time;
     return 0;
   } else if (diff_time <= lidar->packet_interval_max) {
@@ -80,7 +80,7 @@ int32_t Lddc::GetPublishStartTime(LidarDevice *lidar, LidarDataQueue *queue,
     return 0;
   } else {
     /** Skip some packets up to the period boundary*/
-    // RCLCPP_INFO(cur_node_->get_logger(), "2 : %u", diff_time);
+    // RCLCPP_INFO(cur_node_.lock()->get_logger(), "2 : %u", diff_time);
     do {
       if (QueueIsEmpty(queue)) {
         break;
@@ -92,7 +92,7 @@ int32_t Lddc::GetPublishStartTime(LidarDevice *lidar, LidarDataQueue *queue,
       remaining_time = timestamp % publish_period_ns_;
       /** Flip to another period */
       if (last_remaning_time > remaining_time) {
-        // RCLCPP_INFO(cur_node_->get_logger(), "Flip to another period, exit");
+        // RCLCPP_INFO(cur_node_.lock()->get_logger(), "Flip to another period, exit");
         break;
       }
       diff_time = publish_period_ns_ - remaining_time;
@@ -167,7 +167,7 @@ uint32_t Lddc::PublishPointcloud2(LidarDataQueue *queue, uint32_t packet_num,
     int64_t packet_gap = timestamp - last_timestamp;
     if ((packet_gap > lidar->packet_interval_max) &&
         lidar->data_is_pubulished) {
-      // RCLCPP_INFO(cur_node_->get_logger(), "Lidar[%d] packet time interval is %ldns", handle,
+      // RCLCPP_INFO(cur_node_.lock()->get_logger(), "Lidar[%d] packet time interval is %ldns", handle,
       //     packet_gap);
       if (kSourceLvxFile != data_source) {
         timestamp = last_timestamp + lidar->packet_interval;
@@ -189,7 +189,7 @@ uint32_t Lddc::PublishPointcloud2(LidarDataQueue *queue, uint32_t packet_num,
             lidar->extrinsic_parameter, line_num);
       } else {
         /** Skip the packet */
-        RCLCPP_INFO(cur_node_->get_logger(), "Lidar[%d] unkown packet type[%d]", handle,
+        RCLCPP_INFO(cur_node_.lock()->get_logger(), "Lidar[%d] unkown packet type[%d]", handle,
                  raw_packet->data_type);
         break;
       }
@@ -276,7 +276,7 @@ uint32_t Lddc::PublishPointcloudData(LidarDataQueue *queue, uint32_t packet_num,
     int64_t packet_gap = timestamp - last_timestamp;
     if ((packet_gap > lidar->packet_interval_max) &&
         lidar->data_is_pubulished) {
-      //RCLCPP_INFO(cur_node_->get_logger(), "Lidar[%d] packet time interval is %ldns", handle, packet_gap);
+      //RCLCPP_INFO(cur_node_.lock()->get_logger(), "Lidar[%d] packet time interval is %ldns", handle, packet_gap);
       if (kSourceLvxFile != data_source) {
         timestamp = last_timestamp + lidar->packet_interval;
         ZeroPointDataOfStoragePacket(&storage_packet);
@@ -296,7 +296,7 @@ uint32_t Lddc::PublishPointcloudData(LidarDataQueue *queue, uint32_t packet_num,
             line_num);
       } else {
         /* Skip the packet */
-        RCLCPP_INFO(cur_node_->get_logger(), "Lidar[%d] unkown packet type[%d]", handle,
+        RCLCPP_INFO(cur_node_.lock()->get_logger(), "Lidar[%d] unkown packet type[%d]", handle,
                  raw_packet->data_type);
         break;
       }
@@ -421,7 +421,7 @@ uint32_t Lddc::PublishCustomPointcloud(LidarDataQueue *queue,
             line_num);
       } else {
         /* Skip the packet */
-        RCLCPP_INFO(cur_node_->get_logger(), "Lidar[%d] unkown packet type[%d]", handle,
+        RCLCPP_INFO(cur_node_.lock()->get_logger(), "Lidar[%d] unkown packet type[%d]", handle,
                  lidar->raw_data_type);
         break;
       }
@@ -559,7 +559,8 @@ void Lddc::DistributeLidarData(void) {
   if (lds_ == nullptr) {
     return;
   }
-  lds_->semaphore_.Wait();
+  RCLCPP_INFO(cur_node_.lock()->get_logger(), "Semaphore count [%d]", lds_->semaphore_.GetCount());
+  // lds_->semaphore_.Wait();
   for (uint32_t i = 0; i < lds_->lidar_count_; i++) {
     uint32_t lidar_id = i;
     LidarDevice *lidar = &lds_->lidars_[lidar_id];
@@ -580,27 +581,27 @@ void Lddc::DistributeLidarData(void) {
 std::shared_ptr<rclcpp::PublisherBase> Lddc::CreatePublisher(uint8_t msg_type,
     std::string &topic_name, uint32_t queue_size) {
     if (kPointCloud2Msg == msg_type) {
-      RCLCPP_INFO(cur_node_->get_logger(),
+      RCLCPP_INFO(cur_node_.lock()->get_logger(),
           "%s publish use PointCloud2 format", topic_name.c_str());
-      return cur_node_->create_publisher<
+      return cur_node_.lock()->create_publisher<
           sensor_msgs::msg::PointCloud2>(topic_name, queue_size);
     } else if (kLivoxCustomMsg == msg_type) {
-      RCLCPP_INFO(cur_node_->get_logger(),
+      RCLCPP_INFO(cur_node_.lock()->get_logger(),
           "%s publish use livox custom format", topic_name);
-      return cur_node_->create_publisher<
+      return cur_node_.lock()->create_publisher<
           livox_interfaces::msg::CustomMsg>(topic_name, queue_size);
     }
 #if 0
     else if (kPclPxyziMsg == msg_type)  {
-      RCLCPP_INFO(cur_node_->get_logger(),
+      RCLCPP_INFO(cur_node_.lock()->get_logger(),
           "%s publish use pcl PointXYZI format", topic_name.c_str());
-      return cur_node_->create_publisher<PointCloud>(topic_name, queue_size);
+      return cur_node_.lock()->create_publisher<PointCloud>(topic_name, queue_size);
     }
 #endif    
     else if (kLivoxImuMsg == msg_type)  {
-      RCLCPP_INFO(cur_node_->get_logger(),
+      RCLCPP_INFO(cur_node_.lock()->get_logger(),
           "%s publish use imu format", topic_name.c_str());
-      return cur_node_->create_publisher<sensor_msgs::msg::Imu>(topic_name,
+      return cur_node_.lock()->create_publisher<sensor_msgs::msg::Imu>(topic_name,
           queue_size);
     } else {
       std::shared_ptr<rclcpp::PublisherBase>null_publisher(nullptr);
@@ -660,15 +661,15 @@ void Lddc::CreateBagFile(const std::string &file_name) {
   // if (!bag_) {
   //   bag_ = new rosbag::Bag;
   //   bag_->open(file_name, rosbag::bagmode::Write);
-  //   RCLCPP_INFO(cur_node_->get_logger(), "Create bag file :%s!", file_name.c_str());
+  //   RCLCPP_INFO(cur_node_.lock()->get_logger(), "Create bag file :%s!", file_name.c_str());
   // }
 }
 
 void Lddc::PrepareExit(void) {
   // if (bag_) {
-  //   RCLCPP_INFO(cur_node_->get_logger(), "Waiting to save the bag file!");
+  //   RCLCPP_INFO(cur_node_.lock()->get_logger(), "Waiting to save the bag file!");
   //   bag_->close();
-  //   RCLCPP_INFO(cur_node_->get_logger(), "Save the bag file successfully!");
+  //   RCLCPP_INFO(cur_node_.lock()->get_logger(), "Save the bag file successfully!");
   //   bag_ = nullptr;
   // }
   if (lds_) {

@@ -58,8 +58,12 @@ namespace
 
 namespace livox_ros
 {
-LivoxDriver::LivoxDriver(const rclcpp::NodeOptions & node_options)
-: Node("livox_driver_node", node_options)
+LivoxDriver::LivoxDriver(const std::string node_name, const rclcpp::NodeOptions &options)
+: Node(node_name, options)
+{
+}
+
+void LivoxDriver::init()
 {
   RCLCPP_INFO(this->get_logger(), "Livox Ros Driver Version: %s",
     LIVOX_ROS_DRIVER_VERSION_STRING);
@@ -114,7 +118,7 @@ LivoxDriver::LivoxDriver(const rclcpp::NodeOptions & node_options)
   /** Lidar data distribute control and lidar data source set */
   lddc_ptr_ =
     std::make_unique<Lddc>(xfer_format, multi_topic, data_src, output_type, publish_freq, frame_id);
-  lddc_ptr_->SetRosNode(this);
+  lddc_ptr_->SetRosNode(this->weak_from_this());
 
   int ret = 0;
   if (data_src == kSourceRawLidar) {
@@ -131,7 +135,8 @@ LivoxDriver::LivoxDriver(const rclcpp::NodeOptions & node_options)
     ParseCommandlineInputBdCode(cmdline_bd_code.c_str(), bd_code_list);
 
     LdsLidar *read_lidar = LdsLidar::GetInstance(1000 / publish_freq);
-    lddc_ptr_->RegisterLds(static_cast<Lds *>(read_lidar));
+    auto x = lddc_ptr_->RegisterLds(static_cast<Lds *>(read_lidar));
+    RCLCPP_INFO(this->get_logger(), "RegisterLds return %d!", x);
     ret = read_lidar->InitLdsLidar(bd_code_list, user_config_path.c_str());
     if (!ret) {
       RCLCPP_INFO(this->get_logger(), "Init lds lidar success!");
@@ -189,7 +194,7 @@ LivoxDriver::LivoxDriver(const rclcpp::NodeOptions & node_options)
     } while (0);
   }
 
-  poll_thread_ = std::make_shared<std::thread>(&LivoxDriver::pollThread, this);
+  // poll_thread_ = std::make_shared<std::thread>(&LivoxDriver::pollThread, this);
 }
 
 LivoxDriver::~LivoxDriver()
@@ -209,6 +214,6 @@ void LivoxDriver::pollThread()
 }
 }  // namespace livox_ros
 
-#include <rclcpp_components/register_node_macro.hpp>
+// #include <rclcpp_components/register_node_macro.hpp>
 
-RCLCPP_COMPONENTS_REGISTER_NODE(livox_ros::LivoxDriver)
+// RCLCPP_COMPONENTS_REGISTER_NODE(livox_ros::LivoxDriver)

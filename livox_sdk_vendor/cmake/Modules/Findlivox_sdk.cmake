@@ -71,7 +71,7 @@ endif()
 
 # Search for headers and the library
 find_path(livox_sdk_INCLUDE_DIR NAMES "livox_sdk.h" ${livox_sdk_INCLUDE_PATH})
-find_library(livox_sdk_LIBRARY NAMES livox_sdk_static ${livox_sdk_LIBRARY_PATH})
+find_library(livox_sdk_LIBRARY NAMES livox_sdk ${livox_sdk_LIBRARY_PATH})
 
 mark_as_advanced(livox_sdk_INCLUDE_DIR livox_sdk_LIBRARY)
 

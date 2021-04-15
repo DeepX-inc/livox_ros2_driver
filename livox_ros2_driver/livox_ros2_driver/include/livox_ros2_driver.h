@@ -52,17 +52,21 @@ class LivoxDriver: public rclcpp::Node
 {
 public:
 
-  explicit LivoxDriver(const rclcpp::NodeOptions & options);
+  LivoxDriver(const std::string node_name, const rclcpp::NodeOptions &options);
 
   ~LivoxDriver();
+
+  void init();
+
+  std::unique_ptr<Lddc> lddc_ptr_;
 
 private:
   void pollThread();
 
-  std::unique_ptr<Lddc> lddc_ptr_;
   std::shared_ptr<std::thread> poll_thread_;
   std::shared_future<void> future_;
   std::promise<void> exit_signal_;
+
 };
 
 }  // namespace livox_ros
