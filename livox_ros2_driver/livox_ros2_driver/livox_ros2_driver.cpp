@@ -194,7 +194,7 @@ void LivoxDriver::init()
     } while (0);
   }
 
-  // poll_thread_ = std::make_shared<std::thread>(&LivoxDriver::pollThread, this);
+  poll_thread_ = std::make_shared<std::thread>(&LivoxDriver::pollThread, this);
 }
 
 LivoxDriver::~LivoxDriver()

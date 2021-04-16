@@ -559,8 +559,8 @@ void Lddc::DistributeLidarData(void) {
   if (lds_ == nullptr) {
     return;
   }
-  RCLCPP_INFO(cur_node_.lock()->get_logger(), "Semaphore count [%d]", lds_->semaphore_.GetCount());
-  // lds_->semaphore_.Wait();
+
+  lds_->semaphore_.Wait();
   for (uint32_t i = 0; i < lds_->lidar_count_; i++) {
     uint32_t lidar_id = i;
     LidarDevice *lidar = &lds_->lidars_[lidar_id];
