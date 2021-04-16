@@ -93,11 +93,6 @@ void LivoxDriver::init()
   std::string user_config_path;
   std::string cmdline_bd_code;
 
-
-  this->declare_parameter("user_config_path", "path_default");
-  this->declare_parameter("cmdline_input_bd_code", "000000000000001");
-  this->declare_parameter("lvx_file_path", "/home/livox/livox_test.lvx");
-
   auto xfer_format_param = this->get_parameter("xfer_format");
   if (xfer_format_param.get_type() == rclcpp::ParameterType::PARAMETER_NOT_SET) {
     xfer_format = this->declare_parameter<int>("xfer_format", kPointCloud2Msg);
