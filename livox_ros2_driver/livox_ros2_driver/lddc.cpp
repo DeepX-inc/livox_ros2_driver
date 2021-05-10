@@ -177,7 +177,7 @@ uint32_t Lddc::PublishPointcloud2(LidarDataQueue *queue, uint32_t packet_num,
     }
     /** Use the first packet timestamp as pointcloud2 msg timestamp */
     if (!published_packet) {
-      cloud.header.stamp = rclcpp::Time(timestamp);
+      cloud.header.stamp = cur_node_.lock()->get_clock()->now();
     }
     uint32_t single_point_num = storage_packet.point_num * echo_num;
 
@@ -407,7 +407,7 @@ uint32_t Lddc::PublishCustomPointcloud(LidarDataQueue *queue,
       livox_msg.timebase = timestamp;
       packet_offset_time = 0;
       /** convert to ros time stamp */
-      livox_msg.header.stamp = rclcpp::Time(timestamp);
+      livox_msg.header.stamp = cur_node_.lock()->get_clock()->now();
     } else {
       packet_offset_time = (uint32_t)(timestamp - livox_msg.timebase);
     }
