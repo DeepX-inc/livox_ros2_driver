@@ -1,6 +1,6 @@
 # Livox ROS2 Driver([览沃ROS2驱动程序中文说明](https://github.com/Livox-SDK/livox_ros2_driver/blob/master/README_CN.md))
 
-The Livox ROS2 driver is a driver package based on ROS2, specifically used to connect LiDAR products produced by Livox. The driver is currently only recommended to run under ubuntu18.04, the corresponding ROS2 version is dashing, and other versions of ROS2 (such as foxy) are not currently supported.
+The Livox ROS2 driver is a driver package based on ROS2, specifically used to connect LiDAR products produced by Livox. The driver is recommended to run on ROS2 foxy.
 
 ## 0. Version and Release History
 
@@ -33,12 +33,6 @@ For ROS2 installation, please refer to the ROS2 installation guide :
 Please refer to the following link for colcon installation：
 
 [colcon installation](https://index.ros.org/doc/ros2/Tutorials/Colcon-Tutorial/#install-colcon)
-
-### 1.3 Livox-SDK Installation
-
-1. Download or clone [Livox-SDK](https://github.com/Livox-SDK/Livox-SDK) from Github to local;
-
-2. Refer to the corresponding [README.md](https://github.com/Livox-SDK/Livox-SDK/blob/master/README.md) document to install and run Livox-SDK;
 
 ## 2. Get and build livox_ros2_driver
 
