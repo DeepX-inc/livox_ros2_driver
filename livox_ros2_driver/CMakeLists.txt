@@ -47,7 +47,8 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 # livox ros2 driver target
-ament_auto_add_library(${PROJECT_NAME} SHARED
+add_executable(
+  ${PROJECT_NAME}
   livox_ros2_driver/lvx_file.cpp
   livox_ros2_driver/ldq.cpp
   livox_ros2_driver/lds.cpp
@@ -61,7 +62,17 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   common/comm/comm_protocol.cpp
   common/comm/sdk_protocol.cpp
   common/comm/gps_protocol.cpp
-)
+  livox_ros2_driver/livox_ros2_driver.cpp
+  livox_ros2_driver/livox_ros2_driver_node.cpp)
+
+ament_target_dependencies(${PROJECT_NAME}
+  rclcpp
+  std_msgs
+  livox_interfaces
+  sensor_msgs
+  rcutils
+  pcl_conversions
+  rcl_interfaces)
 
 target_compile_options(${PROJECT_NAME}
   PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-missing-field-initializers -fPIC>
@@ -93,11 +104,15 @@ target_link_libraries(${PROJECT_NAME}
 #  ${std_msgs_LIBRARIES}
 #  ${Boost_SYSTEM_LIBRARY}
 
+install(TARGETS
+  ${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
-rclcpp_components_register_node(${PROJECT_NAME}
-  PLUGIN "livox_ros::LivoxDriver"
-  EXECUTABLE ${PROJECT_NAME}_node
-)
+install(TARGETS
+  ${PROJECT_NAME}
+  DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
