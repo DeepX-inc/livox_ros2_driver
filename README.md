@@ -1,5 +1,16 @@
 # Livox ROS2 Driver([览沃ROS2驱动程序中文说明](https://github.com/Livox-SDK/livox_ros2_driver/blob/master/README_CN.md))
 
+## NOTE
+
+Please read the following before installation:
+- we should specify the lidar broadcast code in cmdline_input_bd_code
+- set each broadcast code of lidars in cmdline_input_bd_code.
+- broadcast code is serial number + 1 !
+- since we’re using horizon, we should use 1.
+- please refer following [picture](https://github.com/DeepX-inc/livox_ros2_driver/blob/foxy_devel/images/broadcast_code.png)
+- enable_connect doesn’t work
+- cmdline_input_bd_code is used to connect lidar
+
 The Livox ROS2 driver is a driver package based on ROS2, specifically used to connect LiDAR products produced by Livox. The driver is recommended to run on ROS2 foxy.
 
 ## 0. Version and Release History
