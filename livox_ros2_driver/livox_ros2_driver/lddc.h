@@ -89,6 +89,7 @@ class Lddc {
     std::string &topic_name, uint32_t queue_size);
   std::shared_ptr<rclcpp::PublisherBase> GetCurrentPublisher(uint8_t handle);
   std::shared_ptr<rclcpp::PublisherBase> GetCurrentImuPublisher(uint8_t handle);
+  rclcpp::Publisher<std_msgs::msg::Header>::SharedPtr heartbeat_pub_;
   void PollingLidarPointCloudData(uint8_t handle, LidarDevice *lidar);
   void PollingLidarImuData(uint8_t handle, LidarDevice *lidar);
   void InitPointcloud2MsgHeader(sensor_msgs::msg::PointCloud2& cloud);

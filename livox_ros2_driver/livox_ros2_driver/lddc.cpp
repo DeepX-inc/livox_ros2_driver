@@ -216,6 +216,11 @@ uint32_t Lddc::PublishPointcloud2(LidarDataQueue *queue, uint32_t packet_num,
       <sensor_msgs::msg::PointCloud2>>(GetCurrentPublisher(handle));
   if (kOutputToRos == output_type_) {
     publisher->publish(cloud);
+    if (heartbeat_pub_ != nullptr) {
+      auto msg = std_msgs::msg::Header();
+      msg.stamp = cur_node_.lock()->get_clock()->now();
+      heartbeat_pub_->publish(msg);
+    }
   } else {
 #if 0    
     if (bag_) {
@@ -628,6 +633,8 @@ std::shared_ptr<rclcpp::PublisherBase> Lddc::GetCurrentPublisher(uint8_t handle)
       std::string topic_name("livox/lidar");
       queue_size = queue_size * 8; // shared queue size is 256, for all lidars
       global_pub_ = CreatePublisher(transfer_format_, topic_name, queue_size);
+      heartbeat_pub_ = cur_node_.lock()->create_publisher<
+          std_msgs::msg::Header>("~/heartbeat", 10);
     }
     return global_pub_;
   }
