@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <cstdio>
 #include <thread>
 #include <chrono>
 #include <functional>
