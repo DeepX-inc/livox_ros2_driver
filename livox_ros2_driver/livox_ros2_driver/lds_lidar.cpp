@@ -701,6 +701,11 @@ int LdsLidar::ParseConfigFile(const char *pathname) {
             config.enable_high_sensitivity =
                 object["enable_high_sensitivity"].GetBool();
           }
+          if (object.HasMember("frame_id") &&
+              object["frame_id"].IsString()) {
+            std::string bdc(config.broadcast_code);
+            map_frame_id.emplace(bdc, object["frame_id"].GetString());
+          }
 
           printf("broadcast code[%s] : %d %d %d %d %d %d\n",
                  config.broadcast_code, config.enable_connect,
