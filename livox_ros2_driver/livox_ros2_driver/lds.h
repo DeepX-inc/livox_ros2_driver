@@ -35,6 +35,7 @@
 #include <vector>
 #include <mutex>
 #include <condition_variable>
+#include <unordered_map>
 
 #include "ldq.h"
 
@@ -183,6 +184,7 @@ typedef struct {
   uint32_t firmware_ver; /**< Firmware version of lidar  */
   UserConfig config;
   ExtrinsicParameter extrinsic_parameter;
+  std::string frame_id;
 } LidarDevice;
 
 typedef struct {
@@ -439,6 +441,7 @@ class Lds {
   uint8_t lidar_count_;                 /**< Lidar access handle. */
   LidarDevice lidars_[kMaxSourceLidar]; /**< The index is the handle */
   Semaphore semaphore_;
+  std::unordered_map<std::string, std::string> map_frame_id;
 
  protected:
   uint32_t buffer_time_ms_; /**< Buffer time before data in queue is read */

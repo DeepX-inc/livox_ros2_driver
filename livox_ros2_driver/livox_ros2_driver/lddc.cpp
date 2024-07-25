@@ -150,6 +150,11 @@ uint32_t Lddc::PublishPointcloud2(LidarDataQueue *queue, uint32_t packet_num,
 
   sensor_msgs::msg::PointCloud2 cloud;
   InitPointcloud2MsgHeader(cloud);
+  std::string bdc(lidar->info.broadcast_code);
+  auto bdc_frame_id = lds_->map_frame_id.find(bdc);
+  if (bdc_frame_id != lds_->map_frame_id.end()) {
+    cloud.header.frame_id = bdc_frame_id->second;
+  }
   cloud.data.resize(packet_num * kMaxPointPerEthPacket *
                     sizeof(LivoxPointXyzrtl));
   cloud.point_step = sizeof(LivoxPointXyzrtl);
