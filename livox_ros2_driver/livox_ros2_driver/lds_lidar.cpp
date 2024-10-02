@@ -29,7 +29,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <unordered_map>
+#include <unordered_set>
 
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"
@@ -174,7 +174,7 @@ void LdsLidar::OnLidarDataCb(uint8_t handle, LivoxEthPacket *data,
 
 void LdsLidar::OnDeviceBroadcast(const BroadcastDeviceInfo *info) {
   // Store warning status per broadcast code to avoid showing the same warning
-  static std::unordered_map<std::string, bool> whitelist_warning_shown_map;
+  static std::unordered_set<std::string> whitelist_warning_shown_map;
   
   if (info == nullptr) {
     return;
@@ -198,7 +198,7 @@ void LdsLidar::OnDeviceBroadcast(const BroadcastDeviceInfo *info) {
       if (whitelist_warning_shown_map.find(broadcast_code) == whitelist_warning_shown_map.end()) {
         printf("Not in the whitelist, please add %s to if want to connect!\n",
                info->broadcast_code);
-        whitelist_warning_shown_map[broadcast_code] = true;
+        whitelist_warning_shown_map.insert(broadcast_code);
       }
       return;
     }
