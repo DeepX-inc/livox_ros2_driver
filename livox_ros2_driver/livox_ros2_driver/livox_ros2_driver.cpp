@@ -194,7 +194,12 @@ void LivoxDriver::init()
 
     std::vector<std::string> bd_code_list;
     ParseCommandlineInputBdCode(cmdline_bd_code.c_str(), bd_code_list);
-    RCLCPP_INFO(this->get_logger(), "bd_code_list: %s", bd_code_list);
+    
+    std::string bd_code_str;
+    for (const auto &code : bd_code_list) {
+    	bd_code_str += code + " ";
+    }
+    RCLCPP_INFO(this->get_logger(), "bd_code_list: %s", bd_code_str.c_str());
     RCLCPP_INFO(this->get_logger(), "publish freq: %f", publish_freq);
 
     LdsLidar *read_lidar = LdsLidar::GetInstance(1000 / publish_freq);
