@@ -1,7 +1,7 @@
 # Copyright(c) 2020 livoxtech limited.
 
 cmake_minimum_required(VERSION 3.5)
-project(deepx_livox_ros2_driver)
+project(livox_ros2_driver)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
